@@ -2,7 +2,6 @@ package com.microservice.todo.portfolio.list.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.microservice.todo.portfolio.list.dto.CreatedUserDTO;
@@ -13,18 +12,16 @@ import com.microservice.todo.portfolio.list.service.UserService;
 public class DataInitializerConfig implements CommandLineRunner {
     @Autowired
     private UserService userService;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
-        CreatedUserDTO admin = new CreatedUserDTO();
-        admin.setName("admin");
-        admin.setEmail("admin@hotmail.com");
-        admin.setPassword(passwordEncoder.encode("admin"));
-        admin.setRole(Role.Administrador);
-        boolean adminExists = userService.findByEmail(admin.getEmail()) != null;
-        if (adminExists == false) {
+        String adminEmail = "admin@hotmail.com";
+        if (userService.findByEmail(adminEmail) == null) {
+            CreatedUserDTO admin = new CreatedUserDTO();
+            admin.setName("admin");
+            admin.setEmail(adminEmail);
+            admin.setPassword("admin");
+            admin.setRole(Role.Administrador);
             userService.createdUser(admin);
             System.out.println("Administrador iniciado com sucesso!");
         } else {

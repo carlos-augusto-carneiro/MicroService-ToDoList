@@ -5,7 +5,7 @@ import java.time.Instant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -23,7 +23,7 @@ public class LoginController {
     @Autowired
     private UserService userService;
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private BCryptPasswordEncoder passwordEncoder;
     @Autowired
     private JwtEncoder jwtEncoder;
     
@@ -31,9 +31,7 @@ public class LoginController {
     public ResponseEntity<LoginDTOReponse> login(@RequestBody LoginDTORequest loginDTO){
         var user = userService.findByEmail(loginDTO.email());
 
-        var loginstatus = user.get().isLoginCorrect(loginDTO, passwordEncoder);
-
-        if(user.isEmpty() || !loginstatus){
+        if(user.isEmpty() || !user.get().isLoginCorrect(loginDTO, passwordEncoder)){
             throw new BadCredentialsException("Email ou senha não encontrado");
         }
         var now = Instant.now();
